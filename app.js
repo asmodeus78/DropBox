@@ -24,16 +24,12 @@ app.get('/apps/lista-file', async (req, res) => {
     dbx.filesListFolder({path: ''}).then(function(response) {
         console.log(response);
 
-        var entries = response.entries;
-        for (var i = 0; i < entries.length; i++) {
-            var file = entries[i];
-            console.log(file.name + ' - ' + file.path_lower);
-        }
+       
 
 
 
 
-        res.json({ ok: true, data: response, files:entries });
+        res.json({ ok: true, data: response});
     }).catch(function(error) {
         console.log(error);
     });
