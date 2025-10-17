@@ -45,15 +45,11 @@ app.post('/apps/upload-file', async (req, res) => {
         const ACCESS_TOKEN = process.env.db_token;
 
         var dbx = new Dropbox({ accessToken: ACCESS_TOKEN });
-        dbx.filesListFolder({path: ''})
-            .then(function(response) {
-                console.log(response);
-                res.json({ ok: true, data: response });
-            })
-            .catch(function(error) {
-                console.log(error);
-            });
-
+        const { fileName, fileContent } = req.body;
+        // Carica il file
+        const response = await dbx.filesUpload({ path: '/' + fileName, contents: fileContent });
+        res.json({ ok: true, data: response });
+        
 
 
         // Risposta sempre generica
