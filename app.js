@@ -16,6 +16,19 @@ app.use(bodyParser.json());
 
 app.get('/apps/lista-file', async (req, res) => {
 
+    const ACCESS_TOKEN = process.env.db_token;
+    var dbx = new Dropbox({ accessToken: ACCESS_TOKEN });
+    dbx.filesListFolder({path: ''})
+            .then(function(response) {
+                console.log(response);
+                res.json({ ok: true, data: response });
+            })
+            .catch(function(error) {
+                console.log(error);
+            });
+
+
+
 });
 
 app.post('/apps/upload-file', async (req, res) => {
