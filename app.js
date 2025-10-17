@@ -52,13 +52,44 @@ app.post('/apps/upload-file',upload.single('file'), async (req, res) => {
             return res.status(400).json({ ok: false, errore: 'Nessun file ricevuto' });
         }
 
-        const response = await dbx.filesUpload({
+        const uploaded = await dbx.filesUpload({
             path: '/' + req.file.originalname,
             contents: req.file.buffer,
             mode: { '.tag': 'overwrite' } // opzionale
         });
 
-        res.json({ ok: true, data: response });
+        const path = uploaded.result?.path_lower || uploaded.path_lower || ('/' + req.file.originalname);
+
+        let sharedUrl;
+        try {
+            const linkRes = await dbx.sharingCreateSharedLinkWithSettings({
+                path,
+                settings: { requested_visibility: { '.tag': 'public' } } // chiunque con il link
+            });
+            const url = linkRes.result?.url || linkRes.url;
+            sharedUrl = url.replace('?dl=0', '?dl=1'); // forza download
+        } catch (err) {
+        // Se il link esiste già, recuperalo
+            const tag = err?.error?.error?.['.tag'] || err?.error?.['.tag'];
+            if (tag === 'shared_link_already_exists') {
+                const list = await dbx.sharingListSharedLinks({ path, direct_only: true });
+                const url = list.result?.links?.[0]?.url || list.links?.[0]?.url;
+                if (!url) throw new Error('Impossibile recuperare il link esistente');
+                sharedUrl = url.replace('?dl=0', '?dl=1');
+            } else {
+                throw err;
+            }
+        }
+
+
+        res.json({
+            ok: true,
+            data: {
+                name: req.file.originalname,
+                path,
+                downloadUrl: sharedUrl // link pubblico per scaricare
+            }
+        });
         
 
 
