@@ -14,7 +14,9 @@ app.use(cors());
 
 app.use(bodyParser.json());
 
+app.get('/apps/lista-file', async (req, res) => {
 
+});
 
 app.post('/apps/upload-file', async (req, res) => {
     try {
