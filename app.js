@@ -7,8 +7,6 @@ const cors = require('cors');
 require('isomorphic-fetch'); // or another library of choice.
 var Dropbox = require('dropbox').Dropbox;
 
-// Imposta: TOKEN_ADMIN per il negozio (o recuperalo dinamicamente per ogni shop)
-const ADMIN_API_VERSION = '2025-07';
 
 const app = express();
 app.use(cors());
@@ -16,8 +14,7 @@ app.use(cors());
 
 app.use(bodyParser.json());
 
-// Facoltativo: middleware per verificare la firma dell'App Proxy (HMAC)
-// Implementa la verifica di 'signature' o 'signed_fields' come da docs Shopify.
+
 
 app.post('/apps/upload-file', async (req, res) => {
     try {
