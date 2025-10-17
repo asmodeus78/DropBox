@@ -14,6 +14,9 @@ app.use(cors());
 
 app.use(bodyParser.json());
 
+const multer = require('multer');
+const upload = multer({ /* opzionale: limits: { fileSize: 50 * 1024 * 1024 } */ });
+
 app.get('/apps/lista-file', async (req, res) => {
 
     const ACCESS_TOKEN = process.env.db_token;
@@ -37,7 +40,7 @@ app.get('/apps/lista-file', async (req, res) => {
 
 });
 
-app.post('/apps/upload-file', async (req, res) => {
+app.post('/apps/upload-file',upload.single('file'), async (req, res) => {
     try {
 
 
@@ -45,18 +48,23 @@ app.post('/apps/upload-file', async (req, res) => {
         const ACCESS_TOKEN = process.env.db_token;
 
         var dbx = new Dropbox({ accessToken: ACCESS_TOKEN });
-        const { fileName, fileContent } = req.body;
-        // Carica il file
-        const response = await dbx.filesUpload({ path: '/' + fileName, contents: fileContent });
+        if (!req.file) {
+            return res.status(400).json({ ok: false, errore: 'Nessun file ricevuto' });
+        }
+
+        const response = await dbx.filesUpload({
+            path: '/' + req.file.originalname,
+            contents: req.file.buffer,
+            mode: { '.tag': 'overwrite' } // opzionale
+        });
+
         res.json({ ok: true, data: response });
         
 
 
-        // Risposta sempre generica
-
     } catch (e) {
         // Log interno, risposta generica all'utente
-        console.log(e);
+        console.error(e);
         res.json({ ok: false ,errore: e.message  } );
     }
 });

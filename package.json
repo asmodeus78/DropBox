@@ -5,6 +5,7 @@
     "cors": "^2.8.5",
     "dropbox": "^10.34.0",
     "express": "^5.1.0",
-    "isomorphic-fetch": "^3.0.0"
+    "isomorphic-fetch": "^3.0.0",
+    "multer": "^2.0.2"
   }
 }
