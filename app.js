@@ -56,7 +56,8 @@ app.post('/apps/upload-file', async (req, res) => {
 
     } catch (e) {
         // Log interno, risposta generica all'utente
-        res.json({ ok: false });
+        console.log(e);
+        res.json({ ok: false ,errore: e.message  } );
     }
 });
 
