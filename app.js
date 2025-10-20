@@ -29,6 +29,10 @@ function makeDropbox() {
 }
 
 app.get('/dropbox/start', (req, res) => {
+
+    // per generare il token manualmente
+    // https://www.dropbox.com/oauth2/authorize?client_id=lo7gwqbj2q4bx9t&response_type=code&token_access_type=offline&redirect_uri=https://dropbox-1-w946.onrender.com/dropbox/callback
+    
     const redirectUri = "https://dropbox-1-w946.onrender.com/dropbox"; //process.env.DROPBOX_REDIRECT_URI; // es. http://localhost:3000/dropbox/callback
     const dbxAuth = new DropboxAuth({ clientId: process.env.DROPBOX_APP_KEY });
     const authUrl = dbxAuth.getAuthenticationUrl(
