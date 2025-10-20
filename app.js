@@ -20,7 +20,7 @@ const upload = multer({ /* opzionale: limits: { fileSize: 50 * 1024 * 1024 } */ 
 const { DropboxAuth } = require('dropbox');
 
 app.get('/dropbox/start', (req, res) => {
-    const redirectUri = process.env.DROPBOX_REDIRECT_URI; // es. http://localhost:3000/dropbox/callback
+    const redirectUri = "https://dropbox-1-w946.onrender.com/dropbox"; //process.env.DROPBOX_REDIRECT_URI; // es. http://localhost:3000/dropbox/callback
     const dbxAuth = new DropboxAuth({ clientId: process.env.DROPBOX_APP_KEY });
     const authUrl = dbxAuth.getAuthenticationUrl(
         redirectUri,
