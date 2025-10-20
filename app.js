@@ -17,7 +17,7 @@ app.use(bodyParser.json());
 const multer = require('multer');
 const upload = multer({ /* opzionale: limits: { fileSize: 50 * 1024 * 1024 } */ });
 
-const { Dropbox, DropboxAuth } = require('dropbox');
+const { DropboxAuth } = require('dropbox');
 
 app.get('/dropbox/start', (req, res) => {
     const redirectUri = process.env.DROPBOX_REDIRECT_URI; // es. http://localhost:3000/dropbox/callback
