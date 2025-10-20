@@ -17,6 +17,42 @@ app.use(bodyParser.json());
 const multer = require('multer');
 const upload = multer({ /* opzionale: limits: { fileSize: 50 * 1024 * 1024 } */ });
 
+app.get('/dropbox/start', (req, res) => {
+    const redirectUri = process.env.DROPBOX_REDIRECT_URI; // es. http://localhost:3000/dropbox/callback
+    const dbxAuth = new DropboxAuth({ clientId: process.env.DROPBOX_APP_KEY });
+    const authUrl = dbxAuth.getAuthenticationUrl(
+        redirectUri,
+        null,            // state
+        'code',          // response_type
+        'offline',       // token_access_type -> importante per avere il refresh_token
+        null,            // scope (opzionale)
+        'none',          // include_granted_scopes
+        true             // use PKCE
+    );
+    res.redirect(authUrl);
+});
+
+app.get('/dropbox/callback', async (req, res) => {
+    const code = req.query.code;
+    if (!code) return res.status(400).send('Manca "code"');
+
+    const dbxAuth = new DropboxAuth({
+        clientId: process.env.DROPBOX_APP_KEY,
+        clientSecret: process.env.DROPBOX_APP_SECRET
+    });
+
+    try {
+        const tokenRes = await dbxAuth.getAccessTokenFromCode(process.env.DROPBOX_REDIRECT_URI, code);
+        const refreshToken = tokenRes.result.refresh_token;
+        // Salvalo in modo sicuro (env/DB/secret manager)
+        console.log('REFRESH TOKEN:', refreshToken);
+        res.send('Ottieni il refresh token dalla console e salvalo: DROPBOX_REFRESH_TOKEN=' + refreshToken);
+    } catch (e) {
+        console.error(e);
+        res.status(500).send('Errore ottenendo i token');
+    }
+});
+
 app.get('/apps/lista-file', async (req, res) => {
 
     const ACCESS_TOKEN = process.env.db_token;
@@ -26,11 +62,6 @@ app.get('/apps/lista-file', async (req, res) => {
     // ritorna una lista di file (es. da DB)
     dbx.filesListFolder({path: ''}).then(function(response) {
         console.log(response);
-
-       
-
-
-
 
         res.json({ ok: true, data: response});
     }).catch(function(error) {
