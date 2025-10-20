@@ -19,6 +19,15 @@ const upload = multer({ /* opzionale: limits: { fileSize: 50 * 1024 * 1024 } */ 
 
 const { DropboxAuth } = require('dropbox');
 
+function makeDropbox() {
+    const auth = new DropboxAuth({
+        clientId: process.env.DROPBOX_APP_KEY,
+        clientSecret: process.env.DROPBOX_APP_SECRET,
+        refreshToken: process.env.DROPBOX_REFRESH_TOKEN
+    });
+    return new Dropbox({ auth });
+}
+
 app.get('/dropbox/start', (req, res) => {
     const redirectUri = "https://dropbox-1-w946.onrender.com/dropbox"; //process.env.DROPBOX_REDIRECT_URI; // es. http://localhost:3000/dropbox/callback
     const dbxAuth = new DropboxAuth({ clientId: process.env.DROPBOX_APP_KEY });
@@ -57,8 +66,9 @@ app.get('/dropbox/callback', async (req, res) => {
 
 app.get('/apps/lista-file', async (req, res) => {
 
-    const ACCESS_TOKEN = process.env.db_token;
-    var dbx = new Dropbox({ accessToken: ACCESS_TOKEN });
+    //const ACCESS_TOKEN = process.env.db_token;
+    //var dbx = new Dropbox({ accessToken: ACCESS_TOKEN });
+    const dbx = makeDropbox();
 
 
     // ritorna una lista di file (es. da DB)
@@ -78,9 +88,11 @@ app.post('/apps/upload-file',upload.single('file'), async (req, res) => {
 
 
         // Recupera token per questo shop (es. da DB). Per esempio statico:
-        const ACCESS_TOKEN = process.env.db_token;
+        //const ACCESS_TOKEN = process.env.db_token;
+        //var dbx = new Dropbox({ accessToken: ACCESS_TOKEN });
 
-        var dbx = new Dropbox({ accessToken: ACCESS_TOKEN });
+        const dbx = makeDropbox();
+        
         if (!req.file) {
             return res.status(400).json({ ok: false, errore: 'Nessun file ricevuto' });
         }
